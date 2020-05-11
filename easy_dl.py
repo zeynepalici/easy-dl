@@ -7,7 +7,16 @@ class EasyDL:
 
         self.X = data[:, :len(data[0]) - 1]
         self.Y = data[:, len(data[0]) - 1]
+        self.features = len(self.X[0])
 
         self.layers = layers
         self.units = units
         self.activations = activations
+
+    def learn(self):
+        pass
+
+    def _initialize_weights(self):
+        weights = []
+        for i in range(self.layers):
+            #weights.append(self.)
