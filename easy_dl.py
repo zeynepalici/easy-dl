@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 class EasyDL:
@@ -19,4 +20,22 @@ class EasyDL:
     def _initialize_weights(self):
         weights = []
         for i in range(self.layers):
-            #weights.append(self.)
+            if i == 0:
+                current_weight = np.random.rand(self.units[i], self.features)
+            else:
+                current_weight = np.random.rand(self.units[i], self.units[i - 1])
+
+            weights.append(current_weight)
+
+        return weights
+
+    def _forward_propagation(self):
+        w = []
+        b = []
+        a = []
+        for i in range(self.layers):
+            if i == 0:
+                Z = np.dot(w[i], self.X) + b[i]
+                a.append() #function yaz, z yi ve suanki activation ı gönder
+            else:
+                Z = np.dot(w[i], a[i-1]) + b[i]
