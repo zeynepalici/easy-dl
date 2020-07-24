@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import activations
 
 
 class EasyDL:
@@ -17,15 +18,16 @@ class EasyDL:
 
     def learn(self):
         weight, b_values = self._initialize_parameters()
-        print(weight)
-        print("------------------------------")
-        print(b_values)
+        Z_values, A_values = self._forward_propagation(weight, b_values)
+        print(Z_values)
+        print("---------------")
+        print(A_values)
 
     def _initialize_parameters(self):
         weights = []
         b_values = []
 
-        for i in range(1, self.layers+1):
+        for i in range(1, self.layers + 1):
             current_weight = np.random.rand(self.neurons[i], self.neurons[i - 1])
             current_b = np.random.rand(self.neurons[i], 1)
 
@@ -34,14 +36,18 @@ class EasyDL:
 
         return weights, b_values
 
-    def _forward_propagation(self):
-        w = []
-        b = []
-        a = []
+    def _forward_propagation(self, weights, b_values):
+        Z_values = []
+        A_values = [self.X]
+
         for i in range(self.layers):
-            if i == 0:
-                Z = np.dot(w[i], self.X) + b[i]
-                a.append()  # function yaz, z yi ve suanki activation ı gönder
-                # w[0] :
+            Z_values.append(np.dot(weights[i], A_values[i]) + b_values[i])
+            if not self.activations:
+                if i != self.layers - 1:
+                    A_values.append(activations.relu(Z_values[i]))
+                else:
+                    A_values.append(activations.sigmoid(Z_values[i]))
             else:
-                Z = np.dot(w[i], a[i - 1]) + b[i]
+                pass
+
+        return Z_values, A_values
