@@ -1,6 +1,7 @@
 import easy_dl
 
-if __name__ == "__main__":
+
+def main():
     model = easy_dl.EasyDL("dog.csv", layers=3, neurons=[4, 6, 1])
     model.learn()
 
@@ -8,3 +9,7 @@ if __name__ == "__main__":
     print(test_results)
 
     print(model.predict([0, 0]))
+
+
+if __name__ == "__main__":
+    main()

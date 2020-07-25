@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 import activations_lib
+import sys
 
 
 class EasyDL:
@@ -76,6 +77,7 @@ class EasyDL:
         return Z_values, A_values
 
     def _backward_prop(self, weights, Z_values, A_values):
+        A_values[-1][A_values[-1] == 1] = 0.99
         dA = -np.divide(self.Y, A_values[-1]) + np.divide(1 - self.Y, 1 - A_values[-1])
         dW_values = []
         db_values = []
