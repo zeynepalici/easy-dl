@@ -19,7 +19,15 @@ class EasyDL:
         self.iterations = iterations
 
     def learn(self):
-        weight, b_values = self._initialize_parameters()
+        weights, b_values = self._initialize_parameters()
+
+        for i in range(self.iterations):
+            Z_values, A_values = self._forward_prop(weights, b_values)
+            dW_values, db_values = self._backward_prop(Z_values, A_values)
+            weights = weights - np.dot(self.learning_rate, dW_values)
+            b_values = b_values - np.dot(self.learning_rate, db_values)
+
+        return weights, b_values
 
     def _initialize_parameters(self):
         weights = []
