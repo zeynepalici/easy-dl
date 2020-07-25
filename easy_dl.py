@@ -9,6 +9,7 @@ class EasyDL:
 
         self.X = data[:, :len(data[0]) - 1]
         self.Y = data[:, len(data[0]) - 1]
+        self.Y = self.Y.reshape((self.Y.shape[0], 1))
         self.number_of_examples, self.number_of_features = self.X.shape
 
         self.layers = layers
@@ -29,8 +30,12 @@ class EasyDL:
         for i in range(self.iterations):
             Z_values, A_values = self._forward_prop(weights, b_values)
             dW_values, db_values = self._backward_prop(weights, Z_values, A_values)
-            weights = weights - np.dot(self.learning_rate, dW_values)
-            b_values = b_values - np.dot(self.learning_rate, db_values)
+            dW_values.reverse()
+            db_values.reverse()
+
+            for j in range(self.layers):
+                weights[j] = weights[j] - self.learning_rate * dW_values[j]
+                b_values[j] = b_values[j] - self.learning_rate * db_values[j]
 
         return weights, b_values
 
@@ -58,7 +63,7 @@ class EasyDL:
         return Z_values, A_values
 
     def _backward_prop(self, weights, Z_values, A_values):
-        dA = -(np.divide(self.Y, A_values[len(A_values) - 1]) - np.divide(1 - self.Y, 1 - A_values[len(A_values) - 1]))
+        dA = -np.divide(self.Y, A_values[-1]) + np.divide(1 - self.Y, 1 - A_values[-1])
         dW_values = []
         db_values = []
 
@@ -82,16 +87,14 @@ class EasyDL:
         return Z, A
 
     def _backward_prop_step(self, W, Z, A, dA, activation):
-        # Z values birden fazla matris, her katmanınki farklı bir matris.
-        # buraya gelen Z değeri de tek bir matris.
         dZ = None
         if activation == "relu":
-            dZ = activations_lib.relu_backward(dA, Z)
+            dZ = dA * activations_lib.relu_backward(Z)
         elif activation == "sigmoid":
-            dZ = activations_lib.sigmoid_backward(dA, Z)
+            dZ = dA * activations_lib.sigmoid_backward(Z)
 
-        dW = 1 / self.number_of_examples * np.dot(dZ, A)
-        db = 1 / self.number_of_examples * np.sum(dZ, axis=1, keepdims=True)
-        dA_back = np.dot(W.T, dZ)
+        dW = 1 / self.number_of_examples * np.dot(dZ.T, A)
+        db = 1 / self.number_of_examples * np.sum(dZ, axis=0, keepdims=True)
+        dA_back = np.dot(dZ, W)
 
-        return dW, db, dA_back
+        return dW, db.T, dA_back

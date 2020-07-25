@@ -9,13 +9,18 @@ def sigmoid(X):
     return 1 / (1 + np.exp(-X))
 
 
-def relu_backward(dA, Z_values):
-    dZ = np.array(dA, copy=True)
-    dZ[Z_values <= 0] = 0
-    return dZ
+# def relu_backward(dA, Z_values):
+#     dZ = np.array(dA, copy=True)
+#     dZ[Z_values <= 0] = 0
+#     return dZ
+
+def relu_backward(Z):
+    Z[Z <= 0] = 0
+    Z[Z > 0] = 1
+    return Z
 
 
-def sigmoid_backward(dA, Z_values):
-    s = 1 / (1 + np.exp(-Z_values))
-    dZ = dA * s * (1 - s)
+def sigmoid_backward(Z):
+    s = sigmoid(Z)
+    dZ = s * (1 - s)
     return dZ
