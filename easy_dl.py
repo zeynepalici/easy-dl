@@ -2,11 +2,10 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 import activations_lib
-import sys
 
 
 class EasyDL:
-    def __init__(self, filename, layers=0, neurons=None, activations=None, learning_rate=0.1, iterations=5000):
+    def __init__(self, filename, layers=0, neurons=None, activations=None, learning_rate=0.1, iterations=1000):
         data = pd.read_csv(filename).to_numpy()
 
         self.X = data[:, :len(data[0]) - 1]
@@ -24,6 +23,8 @@ class EasyDL:
         self.predicted_weights = []
         self.predicted_b_values = []
 
+        self.costs = []
+
     def learn(self):
         weights, b_values = self._initialize_parameters()
         if not self.activations:
@@ -32,7 +33,7 @@ class EasyDL:
                 self.activations.append("relu")
             self.activations.append("sigmoid")
 
-        for i in tqdm(iterable=range(self.iterations), desc="Learning"):
+        for _ in tqdm(iterable=range(self.iterations), desc="Learning"):
             Z_values, A_values = self._forward_prop(self.X, weights, b_values)
             dW_values, db_values = self._backward_prop(weights, Z_values, A_values)
             dW_values.reverse()
@@ -42,12 +43,18 @@ class EasyDL:
                 weights[j] = weights[j] - self.learning_rate * dW_values[j]
                 b_values[j] = b_values[j] - self.learning_rate * db_values[j]
 
-        self.predicted_weights = weights
-        self.predicted_b_values = b_values
+            self.predicted_weights = weights
+            self.predicted_b_values = b_values
+
+            self.costs.append(self._compute_cost(self.test()))
+
+        cost_decreasing = all(earlier >= later for earlier, later in zip(self.costs, self.costs[1:]))
+        if not cost_decreasing:
+            print("Cost increased, there might be error on result, tweak with parameters")
 
     def test(self):
         _, A_values = self._forward_prop(self.X, self.predicted_weights, self.predicted_b_values)
-        return np.round(A_values[-1])
+        return A_values[-1]
 
     def predict(self, test_array):
         _, A_values = self._forward_prop(test_array, self.predicted_weights, self.predicted_b_values)
@@ -58,8 +65,8 @@ class EasyDL:
         b_values = []
 
         for i in range(1, self.layers + 1):
-            current_weight = np.random.uniform(low=-0.01, high=0.01, size=(self.neurons[i], self.neurons[i - 1]))
-            current_b = np.random.uniform(low=-0.01, high=0.01, size=(self.neurons[i], 1))
+            current_weight = np.random.randn(self.neurons[i], self.neurons[i - 1])
+            current_b = np.zeros((self.neurons[i], 1))
 
             weights.append(current_weight)
             b_values.append(current_b)
@@ -77,8 +84,9 @@ class EasyDL:
         return Z_values, A_values
 
     def _backward_prop(self, weights, Z_values, A_values):
-        A_values[-1][A_values[-1] == 1] = 0.99
-        dA = -np.divide(self.Y, A_values[-1]) + np.divide(1 - self.Y, 1 - A_values[-1])
+        A_values[-1][A_values[-1] == 1] = 0.999
+
+        dA = -(np.divide(self.Y, A_values[-1]) - np.divide(1 - self.Y, 1 - A_values[-1]))
         dW_values = []
         db_values = []
 
@@ -113,3 +121,12 @@ class EasyDL:
         dA_back = np.dot(dZ, W)
 
         return dW, db.T, dA_back
+
+    def _compute_cost(self, AL):
+        AL[AL == 1] = 0.999
+
+        cost = -1 / self.number_of_examples * np.sum(
+            np.multiply(self.Y, np.log(AL)) + np.multiply((1 - self.Y), np.log(1 - AL)))
+        cost = np.squeeze(cost)
+
+        return cost
