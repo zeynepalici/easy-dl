@@ -20,10 +20,15 @@ class EasyDL:
 
     def learn(self):
         weights, b_values = self._initialize_parameters()
+        if not self.activations:
+            self.activations = []
+            for i in range(self.layers - 1):
+                self.activations.append("relu")
+            self.activations.append("sigmoid")
 
         for i in range(self.iterations):
             Z_values, A_values = self._forward_prop(weights, b_values)
-            dW_values, db_values = self._backward_prop(Z_values, A_values)
+            dW_values, db_values = self._backward_prop(weights, Z_values, A_values)
             weights = weights - np.dot(self.learning_rate, dW_values)
             b_values = b_values - np.dot(self.learning_rate, db_values)
 
@@ -67,7 +72,7 @@ class EasyDL:
         return dW_values, db_values
 
     def _forward_prop_step(self, A_back, W, b, activation):
-        Z = np.dot(W, A_back) + b
+        Z = np.dot(A_back, W.T) + b.T
         A = None
         if activation == "relu":
             A = activations_lib.relu(Z)
@@ -85,7 +90,7 @@ class EasyDL:
         elif activation == "sigmoid":
             dZ = activations_lib.sigmoid_backward(dA, Z)
 
-        dW = 1 / self.number_of_examples * np.dot(dZ, A.T)
+        dW = 1 / self.number_of_examples * np.dot(dZ, A)
         db = 1 / self.number_of_examples * np.sum(dZ, axis=1, keepdims=True)
         dA_back = np.dot(W.T, dZ)
 
