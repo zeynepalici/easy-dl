@@ -9,7 +9,6 @@ def main():
     # print(np.round(test_results))
 
     print(model.predict([8, 7]))
-        print("sictik")
 
 
 if __name__ == "__main__":
