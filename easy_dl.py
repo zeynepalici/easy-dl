@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 import activations_lib
 
 
 class EasyDL:
-    def __init__(self, filename, layers=0, neurons=None, activations=None, learning_rate=0.1, iterations=1000):
-        data = pd.read_csv(filename).to_numpy()  # pandas data frame döndürüyor. biz numpy kullanmak istiyoruz.
+    def __init__(self, filename, layers=0, neurons=None, activations=None, learning_rate=0.1, iterations=5000):
+        data = pd.read_csv(filename).to_numpy()
 
         self.X = data[:, :len(data[0]) - 1]
         self.Y = data[:, len(data[0]) - 1]
@@ -19,6 +20,9 @@ class EasyDL:
         self.learning_rate = learning_rate
         self.iterations = iterations
 
+        self.predicted_weights = []
+        self.predicted_b_values = []
+
     def learn(self):
         weights, b_values = self._initialize_parameters()
         if not self.activations:
@@ -27,8 +31,8 @@ class EasyDL:
                 self.activations.append("relu")
             self.activations.append("sigmoid")
 
-        for i in range(self.iterations):
-            Z_values, A_values = self._forward_prop(weights, b_values)
+        for i in tqdm(iterable=range(self.iterations), desc="Learning"):
+            Z_values, A_values = self._forward_prop(self.X, weights, b_values)
             dW_values, db_values = self._backward_prop(weights, Z_values, A_values)
             dW_values.reverse()
             db_values.reverse()
@@ -37,24 +41,33 @@ class EasyDL:
                 weights[j] = weights[j] - self.learning_rate * dW_values[j]
                 b_values[j] = b_values[j] - self.learning_rate * db_values[j]
 
-        return weights, b_values
+        self.predicted_weights = weights
+        self.predicted_b_values = b_values
+
+    def test(self):
+        _, A_values = self._forward_prop(self.X, self.predicted_weights, self.predicted_b_values)
+        return np.round(A_values[-1])
+
+    def predict(self, test_array):
+        _, A_values = self._forward_prop(test_array, self.predicted_weights, self.predicted_b_values)
+        return np.round(A_values[-1])
 
     def _initialize_parameters(self):
         weights = []
         b_values = []
 
         for i in range(1, self.layers + 1):
-            current_weight = np.random.rand(self.neurons[i], self.neurons[i - 1])
-            current_b = np.random.rand(self.neurons[i], 1)
+            current_weight = np.random.uniform(low=-0.01, high=0.01, size=(self.neurons[i], self.neurons[i - 1]))
+            current_b = np.random.uniform(low=-0.01, high=0.01, size=(self.neurons[i], 1))
 
             weights.append(current_weight)
             b_values.append(current_b)
 
         return weights, b_values
 
-    def _forward_prop(self, weights, b_values):
+    def _forward_prop(self, input_, weights, b_values):
         Z_values = []
-        A_values = [self.X]
+        A_values = [input_]
         for i in range(self.layers):
             current_Z, current_A = self._forward_prop_step(A_values[i], weights[i], b_values[i], self.activations[i])
             Z_values.append(current_Z)
