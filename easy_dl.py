@@ -5,7 +5,7 @@ import activations_lib
 
 
 class EasyDL:
-    def __init__(self, filename, layers=0, neurons=None, activations=None, learning_rate=0.1, iterations=1000):
+    def __init__(self, filename, layers=3, neurons=[4, 6, 1], activations=None, learning_rate=0.1, iterations=1000):
         data = pd.read_csv(filename).to_numpy()
 
         self.X = data[:, :len(data[0]) - 1]
