@@ -48,16 +48,13 @@ class EasyDL:
 
             self.costs.append(self._compute_cost(self.test()))
 
-        cost_decreasing = all(earlier >= later for earlier, later in zip(self.costs, self.costs[1:]))
-        if not cost_decreasing:
-            print("Cost increased, there might be error on result, tweak with parameters")
-
     def test(self):
         _, A_values = self._forward_prop(self.X, self.predicted_weights, self.predicted_b_values)
         return A_values[-1]
 
-    def predict(self, test_array):
-        _, A_values = self._forward_prop(test_array, self.predicted_weights, self.predicted_b_values)
+    def predict(self, filename):
+        test_data = pd.read_csv(filename).to_numpy()
+        _, A_values = self._forward_prop(test_data, self.predicted_weights, self.predicted_b_values)
         return np.round(A_values[-1])
 
     def _initialize_parameters(self):
