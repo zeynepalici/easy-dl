@@ -1,3 +1,5 @@
-- parameter initialization he initialization kullanmalı
+- parameter initialization he initialization kullanıyor artık, bunu test et
+- regularization veya dropout ekle özellikle dropout
 - multiclass classification
-- kullanıcı neuron sayılarını vermezse bir kaç iterasyon yap, en uygun değerleri bul
+- kullanıcı neuron sayılarını vermezse bir kaç iterasyon yap, en uygun değerleri bu
+- minibatch gradient descent ekle
