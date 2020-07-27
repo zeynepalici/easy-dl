@@ -1,0 +1,3 @@
+- parameter initialization he initialization kullanmalı
+- multiclass classification
+- kullanıcı neuron sayılarını vermezse bir kaç iterasyon yap, en uygun değerleri bul
