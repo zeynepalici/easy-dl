@@ -62,7 +62,7 @@ class EasyDL:
         b_values = []
 
         for i in range(1, self.layers + 1):
-            current_weight = np.random.randn(self.neurons[i], self.neurons[i - 1])
+            current_weight = np.random.randn(self.neurons[i], self.neurons[i - 1]) * np.sqrt(2 / self.neurons[i - 1])
             current_b = np.zeros((self.neurons[i], 1))
 
             weights.append(current_weight)
