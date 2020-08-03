@@ -1,7 +1,7 @@
 - parameter initialization he initialization kullanıyor artık, bunu test et
-- batch normalization ekle
-- adam optimization algorithm ekle
-- regularization veya dropout ekle özellikle dropout
-- multiclass classification
-- kullanıcı neuron sayılarını vermezse bir kaç iterasyon yap, en uygun değerleri bu
+- dropout özelliği ekle
 - minibatch gradient descent ekle
+- adam optimization algorithm ekle
+- batch normalization ekle
+- multiclass classification ekle
+- kullanıcı neuron sayılarını vermezse bir kaç iterasyon yap, en uygun değerleri bul
