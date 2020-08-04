@@ -33,6 +33,8 @@ class EasyDL:
                 self.activations.append("relu")
             self.activations.append("sigmoid")
 
+        # TODO: activation'ları initialize etmeyi de parametreler gibi fonksiyon yap
+
         for _ in tqdm(iterable=range(self.iterations), desc="Learning"):
             Z_values, A_values = self._forward_prop(self.X, weights, b_values)
             dW_values, db_values = self._backward_prop(weights, Z_values, A_values)
@@ -51,10 +53,12 @@ class EasyDL:
         return costs
 
     def test(self):
+        # TODO: burası direk içine cevapaları da olan data alsın, accuracy döndürsün, ismi evaluate olsun 
         _, A_values = self._forward_prop(self.X, self.predicted_weights, self.predicted_b_values)
         return A_values[-1]
 
     def predict(self, filename):
+        # TODO: burası filename mi almalı başka bir şey mi almalı onu düşün
         test_data = pd.read_csv(filename).to_numpy()
         _, A_values = self._forward_prop(test_data, self.predicted_weights, self.predicted_b_values)
         return np.round(A_values[-1])
@@ -65,6 +69,7 @@ class EasyDL:
 
         for i in range(1, self.layers + 1):
             current_weight = np.random.randn(self.neurons[i], self.neurons[i - 1]) * np.sqrt(2 / self.neurons[i - 1])
+            # TODO: burda he initialization ekledim, zeynebe göster
             current_b = np.zeros((self.neurons[i], 1))
 
             weights.append(current_weight)
@@ -122,6 +127,7 @@ class EasyDL:
         return dW, db.T, dA_back
 
     def _compute_cost(self, AL):
+        # TODO: bu metod niye burda, yukarıda kullanılıyor yukarı çıkar
         AL[AL == 1] = 0.999
 
         cost = -1 / self.number_of_examples * np.sum(
