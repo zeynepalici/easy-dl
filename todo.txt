@@ -4,4 +4,6 @@
 - adam optimization algorithm ekle
 - batch normalization ekle
 - multiclass classification ekle
+- evaluate ve prediction olarak 2 farklı metod olsun, evaluate verilen test setinde accuracy döndürsün
+- learn metodu aynı zamanda tensorflowdaki fit fonksiyonu gibi history döndürsün, içinde accuracy ve loss metricleri olsun
 - kullanıcı neuron sayılarını vermezse bir kaç iterasyon yap, en uygun değerleri bul

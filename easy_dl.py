@@ -23,9 +23,9 @@ class EasyDL:
         self.predicted_weights = []
         self.predicted_b_values = []
 
-        self.costs = []
-
     def learn(self):
+        costs = []
+
         weights, b_values = self._initialize_parameters()
         if not self.activations:
             self.activations = []
@@ -46,7 +46,9 @@ class EasyDL:
             self.predicted_weights = weights
             self.predicted_b_values = b_values
 
-            self.costs.append(self._compute_cost(self.test()))
+            costs.append(self._compute_cost(self.test()))
+
+        return costs
 
     def test(self):
         _, A_values = self._forward_prop(self.X, self.predicted_weights, self.predicted_b_values)

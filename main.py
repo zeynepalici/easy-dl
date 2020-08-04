@@ -1,9 +1,13 @@
 import easy_dl
+import matplotlib.pyplot as plt
 
 
 def main():
     model = easy_dl.EasyDL("data_banknote_authentication.csv")
-    model.learn()
+    cost_history = model.learn()
+
+    plt.plot(cost_history)
+    plt.show()
 
     print(model.predict("test.csv"))
 
