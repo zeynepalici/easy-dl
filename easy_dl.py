@@ -29,7 +29,7 @@ class EasyDL:
         weights, b_values = self._initialize_parameters()
         if not self.activations:
             self.activations = []
-            for i in range(self.layers - 1):
+            for _ in range(self.layers - 1):
                 self.activations.append("relu")
             self.activations.append("sigmoid")
 
@@ -39,9 +39,9 @@ class EasyDL:
             dW_values.reverse()
             db_values.reverse()
 
-            for j in range(self.layers):
-                weights[j] = weights[j] - self.learning_rate * dW_values[j]
-                b_values[j] = b_values[j] - self.learning_rate * db_values[j]
+            for i in range(self.layers):
+                weights[i] = weights[i] - self.learning_rate * dW_values[i]
+                b_values[i] = b_values[i] - self.learning_rate * db_values[i]
 
             self.predicted_weights = weights
             self.predicted_b_values = b_values
