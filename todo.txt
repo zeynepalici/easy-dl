@@ -1,7 +1,5 @@
-- parameter initialization he initialization kullanıyor artık, bunu test et
-- dropout özelliği ekle
-- minibatch gradient descent ekle
-- adam optimization algorithm ekle
-- batch normalization ekle
 - multiclass classification ekle
-- kullanıcı neuron sayılarını vermezse bir kaç iterasyon yap, en uygun değerleri bul
+- datadaki categorical ozellikleri int yapan yeni bi class oluştur
+- batch normalization ekle
+- adam optimization algorithm ekle
+- dropout özelliği ekle

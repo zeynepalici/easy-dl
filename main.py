@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    model = easy_dl.EasyDL("data_banknote_authentication.csv")
+    model = easy_dl.EasyDL("multi-class-data/wine.csv")
     cost_history = model.learn()
 
     plt.plot(cost_history)
