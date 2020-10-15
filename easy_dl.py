@@ -5,7 +5,8 @@ import activations_lib
 
 
 class EasyDL:
-    def __init__(self, filename, layers=3, neurons=[4, 6, 1], activations=None, learning_rate=0.1, iterations=1000):
+    def __init__(self, filename, layers=3, neurons=[4, 6, 1], activations=None, learning_rate=0.1, epoch=1000,
+                 mini_batch_size=1000):
         data = pd.read_csv(filename).to_numpy()
 
         self.X = data[:, :len(data[0]) - 1]
@@ -18,7 +19,8 @@ class EasyDL:
         self.neurons.insert(0, self.number_of_features)
         self.activations = activations
         self.learning_rate = learning_rate
-        self.iterations = iterations
+        self.epoch = epoch
+        self.mini_batch_size = mini_batch_size
 
         self.predicted_weights = []
         self.predicted_b_values = []
@@ -35,20 +37,28 @@ class EasyDL:
 
         # TODO: activation'ları initialize etmeyi de parametreler gibi fonksiyon yap
 
-        for _ in tqdm(iterable=range(self.iterations), desc="Learning"):
-            Z_values, A_values = self._forward_prop(self.X, weights, b_values)
-            dW_values, db_values = self._backward_prop(weights, Z_values, A_values)
-            dW_values.reverse()
-            db_values.reverse()
+        mini_batch_num = np.ceil(self.number_of_examples / self.mini_batch_size)
+        last_batch_size = self.number_of_examples % self.mini_batch_size
 
-            for i in range(self.layers):
-                weights[i] = weights[i] - self.learning_rate * dW_values[i]
-                b_values[i] = b_values[i] - self.learning_rate * db_values[i]
+        for _ in tqdm(iterable=range(self.epoch), desc="Learning"):
+            for j in range(int(mini_batch_num)):
+                start, end = j * self.mini_batch_size, (j + 1) * self.mini_batch_size
+                if j == mini_batch_num - 1:
+                    end = start + last_batch_size
 
-            self.predicted_weights = weights
-            self.predicted_b_values = b_values
+                Z_values, A_values = self._forward_prop(self.X[start:end], weights, b_values)
+                dW_values, db_values = self._backward_prop(weights, Z_values, A_values,start,end)
+                dW_values.reverse()
+                db_values.reverse()
 
-            costs.append(self._compute_cost(self.test()))
+                for i in range(self.layers):
+                    weights[i] = weights[i] - self.learning_rate * dW_values[i]
+                    b_values[i] = b_values[i] - self.learning_rate * db_values[i]
+
+                self.predicted_weights = weights
+                self.predicted_b_values = b_values
+
+                costs.append(self._compute_cost(self.test()))
 
         return costs
 
@@ -87,10 +97,10 @@ class EasyDL:
 
         return Z_values, A_values
 
-    def _backward_prop(self, weights, Z_values, A_values):
+    def _backward_prop(self, weights, Z_values, A_values, start, end):
         A_values[-1][A_values[-1] == 1] = 0.999
 
-        dA = -(np.divide(self.Y, A_values[-1]) - np.divide(1 - self.Y, 1 - A_values[-1]))
+        dA = -(np.divide(self.Y[start: end], A_values[-1]) - np.divide(1 - self.Y[start: end], 1 - A_values[-1]))
         dW_values = []
         db_values = []
 
