@@ -5,8 +5,8 @@ import activations_lib
 
 
 class EasyDL:
-    def __init__(self, filename, layers=3, neurons=[4, 6, 1], activations=None, learning_rate=0.1, epoch=1000,
-                 mini_batch_size=1000):
+    def __init__(self, filename, neurons=[4, 6, 1], activations=None, learning_rate=0.1, epoch=1000,
+                 mini_batch_size=256):
         data = pd.read_csv(filename).to_numpy()
 
         self.X = data[:, :len(data[0]) - 1]
@@ -14,13 +14,16 @@ class EasyDL:
         self.Y = self.Y.reshape((self.Y.shape[0], 1))
         self.number_of_examples, self.number_of_features = self.X.shape
 
-        self.layers = layers
+        self.layers = len(neurons)
         self.neurons = neurons
         self.neurons.insert(0, self.number_of_features)
         self.activations = activations
         self.learning_rate = learning_rate
         self.epoch = epoch
+
         self.mini_batch_size = mini_batch_size
+        if self.number_of_examples < 2000:
+            self.mini_batch_size = self.number_of_examples
 
         self.predicted_weights = []
         self.predicted_b_values = []
@@ -35,8 +38,6 @@ class EasyDL:
                 self.activations.append("relu")
             self.activations.append("sigmoid")
 
-        # TODO: activation'ları initialize etmeyi de parametreler gibi fonksiyon yap
-
         mini_batch_num = np.ceil(self.number_of_examples / self.mini_batch_size)
         last_batch_size = self.number_of_examples % self.mini_batch_size
 
@@ -47,7 +48,7 @@ class EasyDL:
                     end = start + last_batch_size
 
                 Z_values, A_values = self._forward_prop(self.X[start:end], weights, b_values)
-                dW_values, db_values = self._backward_prop(weights, Z_values, A_values,start,end)
+                dW_values, db_values = self._backward_prop(weights, Z_values, A_values, start, end)
                 dW_values.reverse()
                 db_values.reverse()
 
@@ -58,17 +59,17 @@ class EasyDL:
                 self.predicted_weights = weights
                 self.predicted_b_values = b_values
 
-                costs.append(self._compute_cost(self.test()))
+                costs.append(self._compute_cost(self.evaluate()[0]))
 
         return costs
 
-    def test(self):
-        # TODO: burası direk içine cevapaları da olan data alsın, accuracy döndürsün, ismi evaluate olsun 
+    def evaluate(self):
         _, A_values = self._forward_prop(self.X, self.predicted_weights, self.predicted_b_values)
-        return A_values[-1]
+        train_accuracy = np.sum(np.round(A_values[-1]) == self.Y) / len(self.Y)
+        return A_values[-1], train_accuracy
 
     def predict(self, filename):
-        # TODO: burası filename mi almalı başka bir şey mi almalı onu düşün
+        # TODO: other choices for data other than filename
         test_data = pd.read_csv(filename).to_numpy()
         _, A_values = self._forward_prop(test_data, self.predicted_weights, self.predicted_b_values)
         return np.round(A_values[-1])
@@ -79,13 +80,22 @@ class EasyDL:
 
         for i in range(1, self.layers + 1):
             current_weight = np.random.randn(self.neurons[i], self.neurons[i - 1]) * np.sqrt(2 / self.neurons[i - 1])
-            # TODO: burda he initialization ekledim, zeynebe göster
+            # he initialization / weight initialization for deep networks
             current_b = np.zeros((self.neurons[i], 1))
 
             weights.append(current_weight)
             b_values.append(current_b)
 
         return weights, b_values
+
+    def _compute_cost(self, AL):
+        AL[AL == 1] = 0.999
+
+        cost = -1 / self.number_of_examples * np.sum(
+            np.multiply(self.Y, np.log(AL)) + np.multiply((1 - self.Y), np.log(1 - AL)))
+        cost = np.squeeze(cost)
+
+        return cost
 
     def _forward_prop(self, input_, weights, b_values):
         Z_values = []
@@ -135,13 +145,3 @@ class EasyDL:
         dA_back = np.dot(dZ, W)
 
         return dW, db.T, dA_back
-
-    def _compute_cost(self, AL):
-        # TODO: bu metod niye burda, yukarıda kullanılıyor yukarı çıkar
-        AL[AL == 1] = 0.999
-
-        cost = -1 / self.number_of_examples * np.sum(
-            np.multiply(self.Y, np.log(AL)) + np.multiply((1 - self.Y), np.log(1 - AL)))
-        cost = np.squeeze(cost)
-
-        return cost

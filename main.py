@@ -9,7 +9,8 @@ def main():
     plt.plot(cost_history)
     plt.show()
 
-    print(model.predict("test.csv"))
+    print(f"Train Accuracy: {model.evaluate()[1]}")
+    # print(model.predict("test.csv"))
 
 
 if __name__ == "__main__":
